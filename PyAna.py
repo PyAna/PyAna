@@ -1,6 +1,6 @@
 # Analyzing emulator for Win32 shellcode
 # Development base on Unicorn Framework- Nguyen Anh Quynh
-# copyright by Nguyen Van Luc at VSEC
+# copyright by r0cu3
 from __future__ import print_function
 from unicorn import *
 from unicorn.x86_const import *
@@ -8,10 +8,12 @@ from capstone import *
 import struct
 import pefile
 import sys
+import time
 import tempfile
 
-kr32='kernelkernel32.dll'
 
+kr32='kernelkernel32.dll'
+#kr32=('k',0,'e',0,'r',0,'n',0,'e',0,'l',0,'3',0,'2',0,'.',0,'d',0,'l',0,'l',0)
 def input_shellcode():
     if len(sys.argv) !=2:
         print('\n[+]Usage:' + sys.argv[0] + ' [shellcode]\n')
@@ -75,10 +77,8 @@ def hook_WinExec(id,esp,uc):
     cmd=string_pack(CMD)
     uc.reg_write(UC_X86_REG_ESP,esp+0x08)
     print('0x%0.2x:\tcall WinExec(\'%s\', %d)' % (eip_saved,cmd,nshow))
-    #esp=uc.reg_read(UC_X86_REG_ESP)
     eip_packed=struct.pack('<I',eip_saved)
     uc.mem_write(esp+0x08,eip_packed)
-    #print("esp=%0.2x" % (esp))
 	
 '''
 	hook LoadLIbraryA(lpLib)
@@ -214,52 +214,52 @@ def dll_loader(dllName,base):
 
 #main thread
 def main():
-    print ('\n===Createing Report=======')
-	print ('Emulate w32Shell Start...')
+    print('\n===Createing Report=======')
+    print('Emulate w32Shell Start...')
     try:
 
-        #initialize unicorn emulator
-        mu=Uc(UC_ARCH_X86,UC_MODE_32)
-        #map 10MB for this emulation
-        mu.mem_map(FS,4*1024*1024)
+        # initialize unicorn emulator
+        mu = Uc(UC_ARCH_X86, UC_MODE_32)
+        # map 10MB for this emulation
+        mu.mem_map(FS, 4 * 1024 * 1024)
 
-        shellcode=input_shellcode()
-        #write shellcode to emulation memory
-        mu.mem_write(ADDRESS,shellcode)
+        shellcode = input_shellcode()
+        # write shellcode to emulation memory
+        mu.mem_write(ADDRESS, shellcode)
         # laod dll from disk
-        kernel32=dll_loader('kernel32',DLL_BASE)
-        kernel32_base=DLL_BASE
-        #ntdll_base=DLL_BASE+len(kernel32)
-        #ntdll=dll_loader('ntdll')
-        mu.mem_write(kernel32_base,kernel32)
-        #Initial PEB,TIB,LDR,...
-        TIB=FS
-        PEB=TIB+0x30
-        LDR=PEB+0x0C
-        InInitOrder=LDR+0x1C
-        BaseName=InInitOrder+0x20
+        kernel32 = dll_loader('kernel32', DLL_BASE)
+        kernel32_base = DLL_BASE
+        # ntdll_base=DLL_BASE+len(kernel32)
+        # ntdll=dll_loader('ntdll')
+        mu.mem_write(kernel32_base, kernel32)
+        # Initial PEB,TIB,LDR,...
+        TIB = FS
+        PEB = TIB + 0x30
+        LDR = PEB + 0x0C
+        InInitOrder = LDR + 0x1C
+        BaseName = InInitOrder + 0x20
         # map PEB & LDR Structure to memory
-        mu.mem_write(PEB,struct.pack('<i',PEB))
-        mu.mem_write(LDR,struct.pack('<i',LDR))
-        mu.mem_write(InInitOrder,struct.pack('<i',InInitOrder))
-        mu.mem_write(InInitOrder+8,struct.pack('<i',kernel32_base))
-        mu.mem_write(BaseName,struct.pack('<i',BaseName+4))
-        mu.mem_write(BaseName+4,kr32)
-        #mu.mem_write(InLoadOrderModuleList,struct.pack('<i',InLoadOrderModuleList))
-        #mu.mem_write(InLoadOrderModuleList+4,struct.pack('<i',InLoadOrderModuleList+0x22))
-        #mu.mem_write(InLoadOrderModuleList+0x22+0x18,struct.pack('<i',ntdll_base))
+        mu.mem_write(PEB, struct.pack('<i', PEB))
+        mu.mem_write(LDR, struct.pack('<i', LDR))
+        mu.mem_write(InInitOrder, struct.pack('<i', InInitOrder))
+        mu.mem_write(InInitOrder + 8, struct.pack('<i', kernel32_base))
+        mu.mem_write(BaseName, struct.pack('<i', BaseName + 4))
+        mu.mem_write(BaseName + 4, str(kr32))
+        # mu.mem_write(InLoadOrderModuleList,struct.pack('<i',InLoadOrderModuleList))
+        # mu.mem_write(InLoadOrderModuleList+4,struct.pack('<i',InLoadOrderModuleList+0x22))
+        # mu.mem_write(InLoadOrderModuleList+0x22+0x18,struct.pack('<i',ntdll_base))
 
-        #initialize ESP,EBP register
-        mu.reg_write(UC_X86_REG_ESP,ADDRESS+0x2000)
-        mu.reg_write(UC_X86_REG_EBP,ADDRESS+0x2000)
-        mu.reg_write(UC_X86_REG_FS,TIB)
+        # initialize ESP,EBP register
+        mu.reg_write(UC_X86_REG_ESP, ADDRESS + 0x2000)
+        mu.reg_write(UC_X86_REG_EBP, ADDRESS + 0x2000)
+        mu.reg_write(UC_X86_REG_FS, TIB)
 
         # tracing all instructions with customized callback
-        mu.hook_add(UC_HOOK_CODE,hook_code,None,DLL_BASE,DLL_BASE+4*PageSize)
-        #mu.hook_add(UC_HOOK_CODE,hook_code1,None,0x4020c,0x4020f)
-        mu.emu_start(ADDRESS,ADDRESS+len(shellcode))
+        mu.hook_add(UC_HOOK_CODE, hook_code, None, DLL_BASE, DLL_BASE + 4 * PageSize)
+        # mu.hook_add(UC_HOOK_CODE,hook_code1,None,0x4020c,0x4020f)
+        mu.emu_start(ADDRESS, ADDRESS + len(shellcode))
 
-        print ("Emulation done...")
+        print("Emulation done...")
     except UcError as e:
         print("ERROR: %s" % e)
         mu.emu_stop()
