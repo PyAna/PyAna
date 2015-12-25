@@ -214,13 +214,13 @@ def dll_loader(dllName,base):
 
 #main thread
 def main():
-    print('\n===Createing Report=======')
+    print('\n===Creating Report=======')
     print('Emulate w32Shell Start...')
     try:
 
         # initialize unicorn emulator
         mu = Uc(UC_ARCH_X86, UC_MODE_32)
-        # map 10MB for this emulation
+        # map 4MB for this emulation
         mu.mem_map(FS, 4 * 1024 * 1024)
 
         shellcode = input_shellcode()

