@@ -1,6 +1,6 @@
 # Analyzing emulator for Win32 shellcode
 # Development base on Unicorn Framework- Nguyen Anh Quynh
-# copyright by r0cu3
+# copyright by Nguyen Van Luc at VSEC
 from __future__ import print_function
 from unicorn import *
 from unicorn.x86_const import *
@@ -8,7 +8,6 @@ from capstone import *
 import struct
 import pefile
 import sys
-import time
 import tempfile
 
 
@@ -204,17 +203,6 @@ def hook_code(uc, address, size, user_data):
 
     if((eip in imp_des)):
         globals()['hook_'+imp_des[eip]](eip,esp,uc)
-        '''
-        if(imp_des[eip]=='WinExec'):
-            hook_WinExec(eip,esp,uc)
-        if(imp_des[eip]=='LoadLibraryA'):
-            hook_LoadLibraryA(eip,esp,uc)
-        if(imp_des[eip]=='GetTempPathA'):
-            hook_GetTempPathA(eip,esp,uc)
-        if(imp_des[eip]=='URLDownloadToFileA'):
-            hook_URLDownloadToFile(eip,esp,uc)
-        if(imp_des[eip]=='ExitProcess'):
-            hook_ExitProcess(eip,esp,uc)'''
 def dll_loader(dllName,base):
     path='C:\Windows\SysWOW64\\'+dllName+'.dll'
     dll=pefile.PE(path,fast_load=True)
