@@ -6,7 +6,8 @@ Using Unicorn Framework for emulating shellcode. PyAna emulate a process on Wind
 - From command line type: PyAna.py [shellcode]
 
 #Dependencies
- -This tool depend on  Unicorn Framework developing by Nguyen Anh Quynh. Download and install them at http://www.unicorn-engine.org/.
+ - This tool depend on  Unicorn Framework developing by Nguyen Anh Quynh. Download and install them at http://www.unicorn-engine.org/.
+ - Beside, depend on pefile by Ero Carrera
 #Status
 - Implement in Python using Unicorn binding
 - Emulating  a simple shellcode: calc, UrlDownloadToFile
