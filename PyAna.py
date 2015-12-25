@@ -10,7 +10,6 @@ import pefile
 import sys
 import tempfile
 
-
 kr32='kernelkernel32.dll'
 
 def input_shellcode():
