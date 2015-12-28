@@ -1,6 +1,6 @@
 # Analyzing emulator for Win32 shellcode
 # Development base on Unicorn Framework- Nguyen Anh Quynh
-# copyright by r0cu3
+# copyright by Nguyen Van Luc
 from __future__ import print_function
 from unicorn import *
 from unicorn.x86_const import *
@@ -30,7 +30,7 @@ def input_shellcode():
 FS=0x1000
 ADDRESS=0x40100
 DLL_BASE=0x78000
-PageSize=0x80000 # 521kB
+PageSize=0x80000 # 512kB
 #map Win32 API address and name function
 imp_des={}
 
