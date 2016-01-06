@@ -203,7 +203,7 @@ def hook_code(uc, address, size, user_data):
     if((eip in imp_des)):
         globals()['hook_'+imp_des[eip]](eip,esp,uc)
 def dll_loader(dllName,base):
-    path='C:\Windows\SysWOW64\\'+dllName+'.dll'
+    path='dll\\'+dllName+'.dll'
     dll=pefile.PE(path,fast_load=True)
     dll.parse_data_directories()
     data=bytearray(dll.get_memory_mapped_image())
