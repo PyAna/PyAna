@@ -16,7 +16,7 @@ PyAna depends on :
 #Status
 * Implement in Python using Unicorn binding
 * Emulating  a simple shellcode: calc, UrlDownloadToFile
-* Windows system structure emulator is not completely
+* Windows system structure emulator is not complete
 * A few of Win32 API hooking
 * Only support 32 bit
 
