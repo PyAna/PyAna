@@ -8,7 +8,7 @@ from capstone import *
 import struct
 import pefile
 import sys
-import time
+import os
 import tempfile
 
 
@@ -57,7 +57,7 @@ def hook_GetTempPathA(id,esp,uc):
     lBuffer=pops(uc,esp+4)
     pBuffer=pops(uc,esp+8)
     eip_saved=pops(uc,esp)
-    tempPath=tempfile.gettempdir()
+    tempPath='\\temp\\'
     uc.mem_write(pBuffer,tempPath)
     uc.reg_write(UC_X86_REG_ESP,esp+0x08)
     uc.reg_write(UC_X86_REG_EAX,len(tempPath))
@@ -203,7 +203,8 @@ def hook_code(uc, address, size, user_data):
     if((eip in imp_des)):
         globals()['hook_'+imp_des[eip]](eip,esp,uc)
 def dll_loader(dllName,base):
-    path='dll\\'+dllName+'.dll'
+    module=dllName+'.dll'
+    path='dll/'+module
     dll=pefile.PE(path,fast_load=True)
     dll.parse_data_directories()
     data=bytearray(dll.get_memory_mapped_image())
@@ -226,7 +227,7 @@ def main():
         shellcode = input_shellcode()
         # write shellcode to emulation memory
         mu.mem_write(ADDRESS, shellcode)
-        # laod dll from disk
+        # load dll from disk
         kernel32 = dll_loader('kernel32', DLL_BASE)
         kernel32_base = DLL_BASE
         # ntdll_base=DLL_BASE+len(kernel32)
