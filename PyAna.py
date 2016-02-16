@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 # Analyzing emulator for Win32 shellcode
 # Development base on Unicorn Framework- Nguyen Anh Quynh
 # copyright by Nguyen Van Luc
